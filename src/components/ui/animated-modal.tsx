@@ -2,14 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
-import React, {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
 
 interface ModalContextType {
   open: boolean;
@@ -20,40 +13,22 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
-
-  return (
-    <ModalContext.Provider value={{ open, setOpen }}>
-      {children}
-    </ModalContext.Provider>
-  );
+  return <ModalContext.Provider value={{ open, setOpen }}>{children}</ModalContext.Provider>;
 };
 
 export const useModal = () => {
   const context = useContext(ModalContext);
-  if (!context) {
-    throw new Error("useModal must be used within a ModalProvider");
-  }
+  if (!context) throw new Error("useModal must be used within a ModalProvider");
   return context;
 };
 
-export function Modal({ children }: { children: ReactNode }) {
-  return <ModalProvider>{children}</ModalProvider>;
-}
+export const Modal = ({ children }: { children: ReactNode }) => <ModalProvider>{children}</ModalProvider>;
 
-export const ModalTrigger = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
+export const ModalTrigger = ({ children, className }: { children: ReactNode; className?: string }) => {
   const { setOpen } = useModal();
   return (
     <button
-      className={cn(
-        "px-4 py-2 rounded-md text-black dark:text-white text-center relative overflow-hidden",
-        className
-      )}
+      className={cn("px-4 py-2 rounded-md text-black dark:text-white relative overflow-hidden", className)}
       onClick={() => setOpen(true)}
     >
       {children}
@@ -61,27 +36,15 @@ export const ModalTrigger = ({
   );
 };
 
-export const ModalBody = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
+export const ModalBody = ({ children, className }: { children: ReactNode; className?: string }) => {
   const { open, setOpen } = useModal();
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
   }, [open]);
 
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  // FIXED TYPE
-useOutsideClick(modalRef as React.RefObject<HTMLDivElement>, () => setOpen(false));
-
-
-
-
+  useOutsideClick(modalRef, () => setOpen(false));
 
   return (
     <AnimatePresence>
@@ -93,17 +56,16 @@ useOutsideClick(modalRef as React.RefObject<HTMLDivElement>, () => setOpen(false
           className="fixed inset-0 z-50 flex items-center justify-center"
         >
           <Overlay />
-
           <motion.div
             ref={modalRef}
             className={cn(
-              "min-h-[50%] max-h-[90%] md:max-w-[40%] bg-white dark:bg-neutral-950 border dark:border-neutral-800 md:rounded-2xl relative z-50 flex flex-col flex-1 overflow-hidden",
+              "max-h-[90vh] w-full md:max-w-4xl bg-black/90 rounded-lg relative z-50 flex flex-col overflow-hidden",
               className
             )}
-            initial={{ opacity: 0, scale: 0.5, rotateX: 40, y: 40 }}
-            animate={{ opacity: 1, scale: 1, rotateX: 0, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, rotateX: 10 }}
-            transition={{ type: "spring", stiffness: 260, damping: 15 }}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
           >
             <CloseIcon />
             {children}
@@ -114,95 +76,44 @@ useOutsideClick(modalRef as React.RefObject<HTMLDivElement>, () => setOpen(false
   );
 };
 
-export const ModalContent = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex flex-col flex-1 p-8 md:p-10", className)}>
-      {children}
-    </div>
-  );
+export const ModalContent = ({ children, className }: { children: ReactNode; className?: string }) => {
+  return <div className={cn("flex flex-col flex-1 p-4 md:p-6 overflow-y-auto", className)}>{children}</div>;
 };
 
-export const ModalFooter = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div
-      className={cn(
-        "flex justify-end p-4 bg-gray-100 dark:bg-neutral-900",
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
+export const ModalFooter = ({ children, className }: { children: ReactNode; className?: string }) => {
+  return <div className={cn("flex justify-end p-4 bg-black/80", className)}>{children}</div>;
 };
 
-const Overlay = ({ className }: { className?: string }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1, backdropFilter: "blur(10px)" }}
-      exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-      className={`fixed inset-0 h-full w-full bg-black bg-opacity-50 z-40 ${className}`}
-    />
-  );
-};
+const Overlay = ({ className }: { className?: string }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 0.5 }}
+    exit={{ opacity: 0 }}
+    className={`fixed inset-0 bg-black z-40 ${className}`}
+  />
+);
 
 const CloseIcon = () => {
   const { setOpen } = useModal();
   return (
     <button
       onClick={() => setOpen(false)}
-      className="absolute top-4 right-4 group"
+      className="absolute z-50 text-2xl font-bold text-white transition top-4 right-4 hover:text-red-400"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-4 h-4 text-black transition duration-200 dark:text-white group-hover:scale-125 group-hover:rotate-3"
-      >
-        <path stroke="none" d="M0 0h24v24H0z" />
-        <path d="M18 6l-12 12" />
-        <path d="M6 6l12 12" />
-      </svg>
+      ×
     </button>
   );
 };
 
-// FIXED VERSION (TYPE SAFE)
-export const useOutsideClick = (
-  ref: React.RefObject<HTMLDivElement>,
-  callback: (event: MouseEvent | TouchEvent) => void
-) => {
+// Hook untuk klik di luar modal
+export const useOutsideClick = (ref: React.RefObject<HTMLDivElement | null>, callback: () => void) => {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
-      const element = ref.current;
-      if (!element) return;
-
-      if (element.contains(event.target as Node)) return;
-
-      callback(event);
+      if (!ref.current || ref.current.contains(event.target as Node)) return;
+      callback();
     };
-
     document.addEventListener("mousedown", listener);
     document.addEventListener("touchstart", listener);
-
     return () => {
       document.removeEventListener("mousedown", listener);
       document.removeEventListener("touchstart", listener);
@@ -210,11 +121,5 @@ export const useOutsideClick = (
   }, [ref, callback]);
 };
 
-// ⬇⬇⬇ WAJIB ADA (BIAR BISA DI-IMPORT DEFAULT)
-export default {
-  Modal,
-  ModalTrigger,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-};
+// Export default object
+export default { Modal, ModalTrigger, ModalBody, ModalContent, ModalFooter, useModal };

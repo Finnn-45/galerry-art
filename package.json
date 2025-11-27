@@ -10,9 +10,12 @@
     "build:css": "tailwindcss -i ./src/app/globals.css -o ./src/app/tailwind.css --watch"
   },
   "dependencies": {
+    "@tsparticles/engine": "^3.9.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.0.0",
+    "framer-motion": "^12.23.24",
     "lucide-react": "^0.554.0",
     "motion": "^12.23.24",
     "next": "16.0.3",
@@ -21,6 +24,7 @@
     "react-masonry-css": "^1.0.16",
     "sharp": "^0.34.4",
     "tailwind-merge": "^2.5.0",
+    "tailwind-scrollbar": "^2.0.1",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.1.12"
   },
