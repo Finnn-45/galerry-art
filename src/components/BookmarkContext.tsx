@@ -8,7 +8,6 @@ type ImageData = {
   alt_description?: string;
 };
 
-
 type BookmarkContextType = {
   bookmarks: ImageData[];
   toggleBookmark: (img: ImageData) => void;
@@ -40,4 +39,3 @@ export const useBookmarks = () => {
   if (!ctx) throw new Error("useBookmarks must be used within BookmarkProvider");
   return ctx;
 };
-  
